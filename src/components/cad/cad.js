@@ -32,7 +32,7 @@ const Cad= () => {
                 nascDate: userType === 'familiar/amigo' ? nascDate : '',
             });
             alert('Cadastro realizado com sucesso');
-            navigation.navigate('Inicio');
+            navigation.navigate('Connect');
         } catch (error) {
             alert('Cadastro falhou');
             console.error(error);

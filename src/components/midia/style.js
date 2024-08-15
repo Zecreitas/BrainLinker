@@ -16,7 +16,19 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: -5,
         marginLeft: 1,
-    }
+    },
+    botao: {
+        backgroundColor: '#092845',
+        padding: 15,
+        borderRadius: 5,
+        marginVertical: 10,
+        width: '80%',
+        alignItems: 'center',
+      },
+      botaoTexto: {
+        color: 'white',
+        fontWeight: 'bold',
+      },
 });
 
 export default styles

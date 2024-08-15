@@ -1,44 +1,47 @@
-import React, {useState, useEffect } from 'react';
-import {Image, View, TouchableOpacity, Text, } from 'react-native';
+import React, { useEffect } from 'react';
+import { Image, View, Alert } from 'react-native';
 import styles from './style';
-import jwt_decode from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
-import { useNavigation} from '@react-navigation/native';
+import { jwtDecode } from "jwt-decode";
+import { useNavigation } from '@react-navigation/native';
 
 const Carregamento = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
     const checkLogin = async () => {
-        try {
-            const token = await AsyncStorage.getItem('token');
-            const user = await AsyncStorage.getItem('user');
+      try {
+        const token = await AsyncStorage.getItem('token');
+        const user = await AsyncStorage.getItem('user');
+        
+        if (token && user) {
+          const decoded = jwtDecode(token);
 
-            if (token && user) {
-                // Existe token e usuário, navegue para a tela inicial
-                navigation.navigate('Inicio');
-            } else {
-                // Não há token ou usuário, navegue para a tela de login
-                navigation.navigate('Logo');
-            }
-        } catch (error) {
-            console.log('Erro ao verificar o login:', error);
+          // Verificar a data de expiração do token
+          const currentTime = Date.now() / 1000;
+          if (decoded.exp < currentTime) {
+            Alert.alert('Erro', 'O token expirou. Por favor, faça login novamente.');
+            navigation.navigate('Logo');
+          } else {
+            
+            navigation.navigate('Connect', { token });
+          }
+        } else {
+          navigation.navigate('Logo');
         }
+      } catch (error) {
+        console.log('Erro ao verificar o login:', error);
+        navigation.navigate('Logo');
+      }
     };
 
     checkLogin();
-}, []);
-
+  }, [navigation]);
 
   return (
     <View>
-      <Image style={styles.image}
-          source={require('../../../assets/images/logo.png')}
-      ></Image>
+      <Image style={styles.image} source={require('../../../assets/images/logo.png')} />
     </View>
-    
   );
 };
 

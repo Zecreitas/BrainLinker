@@ -19,13 +19,17 @@ const Logo = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.post('http://192.168.100.21:3000/api/login', { email, password });
-      
+
       const { token, user } = response.data;
+
+      if (token && user) {
+        await AsyncStorage.setItem('token', token);
+        await AsyncStorage.setItem('user', JSON.stringify(user));
   
-      await AsyncStorage.setItem('token', token);
-      await AsyncStorage.setItem('user', JSON.stringify(user));
-  
-      navigation.navigate('Inicio');
+        navigation.navigate('Connect');
+      } else {
+        alert('Dados de login inválidos');
+      }
     } catch (error) {
       console.error('Erro ao fazer login:', error.response ? error.response.data : error.message);
       alert('Erro ao fazer login. Verifique suas credenciais e tente novamente.');

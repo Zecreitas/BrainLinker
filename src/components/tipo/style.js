@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   },
   amigo: {
     marginTop: 160,
-    marginLeft: 45,
+    marginLeft: 60,
     color: 'black',
     fontSize: 22,
     fontWeight: 'bold',
