@@ -96,14 +96,13 @@ const Inicio = () => {
 
   useEffect(() => {
     if (token && connectionId) {
+      
       carregarMidias();
     }
   }, [token, connectionId]);
   const carregarMidias = async () => {
     try {
-      // está recebendo o connectionid com aspas, essa const tira elas
       const cleanedConnectionId = connectionId.replace(/"/g, '');
-      
       const response = await axios.get(`http://192.168.100.21:3000/api/midias/${cleanedConnectionId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -111,6 +110,7 @@ const Inicio = () => {
       });
   
       if (response.status === 200) {
+        console.log('Mídias recebidas:', response.data);
         setMidias(response.data);
       } else {
         Alert.alert('Erro', 'Não foi possível carregar as mídias');
@@ -130,19 +130,15 @@ const Inicio = () => {
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {midias.length > 0 ? (
-          midias.map((midia) => (
-            <View key={midia._id} style={styles.midiaContainer}>
-              <Image source={{ uri: `http://192.168.100.21:3000/${midia.caminho}` }} style={styles.midiaImage} />
-              {/* recebo o caminho certo mas a imagem não aparece, postman funciona, tenho que ver o que pode ter de errado */}
-              <Text style={styles.midiaDescription}>{midia.descricao}</Text>
-              <Text style={styles.midiaDate}>{midia.tipo}</Text>
-            </View>
-          ))
-        ) : (
-          <Text style={styles.noMidiaText}>Nenhuma mídia disponível</Text>
-          // não sei se é a minha internet que cai mas as vezses não retorna midia e da erro axiosnetwork
-        )}
+      {midias.map((midia) => (
+      <View key={midia._id} style={styles.midiaCard}>
+        <Image 
+          source={{ uri: `http://192.168.100.21:3000/${midia.caminho.replace(/\\/g, '/')}` }} 
+          style={styles.midiaImage} 
+        />
+        <Text style={styles.midiaDescription}>{midia.descricao}</Text>
+      </View>
+    ))}
       </ScrollView>
     </View>
   );
