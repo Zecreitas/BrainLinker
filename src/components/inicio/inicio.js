@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
+import { Text, View, ScrollView, TouchableOpacity, Alert, Image, ActivityIndicator } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Midia from '../midia/midia';
 import Mensagens from '../mensagens/mensagens';
@@ -8,6 +8,7 @@ import styles from './style';
 import axios from 'axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 
@@ -55,18 +56,6 @@ function MyTabs() {
           ),
         }}
       />
-      <Tab.Screen
-        name="Agenda"
-        component={Agenda}
-        options={{
-          tabBarLabel: 'Agenda',
-          tabBarInactiveTintColor: 'white',
-          tabBarActiveTintColor: '#06C8F2',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="calendar" color={color} size={35} marginTop={3.5} />
-          ),
-        }}
-      />
     </Tab.Navigator>
   );
 }
@@ -75,6 +64,8 @@ const Inicio = () => {
   const [midias, setMidias] = useState([]);
   const [token, setToken] = useState('');
   const [connectionId, setConnectionId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const carregarDados = async () => {
@@ -96,50 +87,42 @@ const Inicio = () => {
 
   useEffect(() => {
     if (token && connectionId) {
-      
       carregarMidias();
     }
   }, [token, connectionId]);
+
   const carregarMidias = async () => {
     try {
+      setLoading(true); 
       const cleanedConnectionId = connectionId.replace(/"/g, '');
       const response = await axios.get(`http://192.168.100.21:3000/api/midias/${cleanedConnectionId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-        }
+        },
       });
   
       if (response.status === 200) {
-        console.log('Mídias recebidas:', response.data);
         setMidias(response.data);
       } else {
         Alert.alert('Erro', 'Não foi possível carregar as mídias');
       }
     } catch (error) {
       console.error('Erro ao carregar as mídias:', error);
-      Alert.alert('Erro', 'Não foi possível carregar as mídias');
+    } finally {
+      setLoading(false); 
     }
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <View style={styles.nav}>
-        <TouchableOpacity style={styles.user}>
+        <TouchableOpacity style={styles.user}
+          onPress={() => navigation.navigate('User')}
+        >
           <MaterialCommunityIcons name="account-circle" color="white" size={44} />
           <Text style={styles.userText}>Usuário</Text>
         </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-      {midias.map((midia) => (
-      <View key={midia._id} style={styles.midiaCard}>
-        <Image 
-          source={{ uri: `http://192.168.100.21:3000/${midia.caminho.replace(/\\/g, '/')}` }} 
-          style={styles.midiaImage} 
-        />
-        <Text style={styles.midiaDescription}>{midia.descricao}</Text>
-      </View>
-    ))}
-      </ScrollView>
     </View>
   );
 };

@@ -7,6 +7,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: 50
     },
+    
 });
 
 export default styles

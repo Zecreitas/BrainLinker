@@ -32,29 +32,35 @@ const styles = StyleSheet.create({
       midiaImage: {
         width: 300,
         height: 200,
-        resizeMode: 'contain',
         borderColor: '#092845',
-        borderWidth: 2,
-        marginVertical: 10
+        borderWidth: 3,
+        marginVertical: 10,
+ 
       },
       midiaCard: {
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(9, 40, 69, 0.11)',
+        backgroundColor: 'rgba(17, 25, 32, 0.21)',
         padding: 10,
         borderRadius: 20,
         marginVertical: 15,
         width: '85%',
         alignSelf: 'center',
+        paddingBottom: 30,
+        paddingTop: 100,
+        marginBottom: 40,
+        shadowColor: "#000",
       },
       midiaDescription: {
         color: 'black',
-        fontSize: 17,
+        fontSize: 18,
         fontWeight: 'medium',
         alignSelf: 'center',
-        marginVertical: 10
+        marginVertical: 10,
       },
-        
+      container: {
+        marginBottom: 50,
+      },
 });
 
 export default styles

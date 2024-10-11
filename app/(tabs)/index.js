@@ -11,6 +11,8 @@ import Mensagens from '../../src/components/mensagens/mensagens';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Connect from '../../src/components/connect/connect';
 import Carregamento from '../../src/components/carregamento/carregamento';
+import User from '../../src/components/user/user';
+import Dados from '../../src/components/dados/dados';
 const Stack = createNativeStackNavigator();
 
 const YourApp = () => {
@@ -59,6 +61,14 @@ const YourApp = () => {
         <Stack.Screen
           name="Connect"
           component={Connect}
+        />
+        <Stack.Screen
+          name="User"
+          component={User}
+        />
+        <Stack.Screen
+          name="Dados"
+          component={Dados}
         />
       </Stack.Navigator>
   );

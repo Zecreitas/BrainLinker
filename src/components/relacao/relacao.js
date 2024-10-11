@@ -10,30 +10,31 @@ const Relacao= () => {
 
   const [relation, setRelation] = useState('');
   const [nascDate, setNascDate] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleRelacao = () => {
     if (!relation || !nascDate) {
-        Alert.alert('Error', 'Please fill in all fields');
+        setErrorMessage('Preencha todos os campos para continuar.');
         return;
     }
+    setErrorMessage(''); 
     navigation.navigate('Cad', { userType, relation, nascDate });
 };
+
   return (
     <View>
         <View>
         <Image style={styles.image}
-          source={require('../../../assets/images/logo.png')}>
-        </Image>  
+          source={require('../../../assets/images/logo.png')} />
         </View>
         <Text style={styles.texto}>O que Você é do Paciente?</Text>
         <TextInput
                 style={styles.formInput}
-                placeholder="Exemplo: Filho, sobrinho,amigo,etc."
+                placeholder="Exemplo: Filho, sobrinho, amigo, etc."
                 placeholderTextColor={'white'}
                 value={relation}
                 onChangeText={setRelation}
-        >
-        </TextInput>
+        />
         <Text style={styles.texto}>Qual é a sua data de nascimento?</Text>
         <TextInput
                 style={styles.formInput}
@@ -41,14 +42,13 @@ const Relacao= () => {
                 placeholderTextColor={'white'}
                 value={nascDate}
                 onChangeText={setNascDate}
-        >
-        </TextInput>
-        <TouchableOpacity style={styles.login}
-        onPress={handleRelacao}>
+        />
+        <TouchableOpacity style={styles.login} onPress={handleRelacao}>
           <Text style={styles.text}>Continuar</Text>
         </TouchableOpacity>
+
+        {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
-    
   );
 };
 

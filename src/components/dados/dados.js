@@ -2,17 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import styles from './style';
-import Dados from '../dados/dados';
 import { useNavigation } from '@react-navigation/native';
-import { Clipboard } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import styles from './style';
 
-const User = () => {
+const Dados = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [copiedMessage, setCopiedMessage] = useState('');
-  const navigation = useNavigation(); 
+  const navigation = useNavigation();
 
   useEffect(() => {
     const carregarDadosUsuario = async () => {
@@ -22,8 +19,11 @@ const User = () => {
         
         if (storedToken && userId) {
           const response = await axios.get(`http://192.168.100.21:3000/api/user/${userId}`, {
-            headers: { 'Authorization': `Bearer ${storedToken}` },
+            headers: {
+              'Authorization': `Bearer ${storedToken}`,
+            },
           });
+          
           if (response.status === 200) {
             setUserData(response.data);
           }
@@ -38,12 +38,6 @@ const User = () => {
     carregarDadosUsuario();
   }, []);
 
-  const copyToClipboard = (email) => {
-    Clipboard.setString(email);
-    setCopiedMessage('Email copiado!'); 
-    setTimeout(() => setCopiedMessage(''), 2000); 
-  };
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -55,22 +49,26 @@ const User = () => {
   return (
     <ScrollView style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Icon name="arrow-back" size={24} color="#000" />
+        <Icon name="arrow-back" size={30} color="#000" />
       </TouchableOpacity>
 
-      <Text style={styles.title}>Conta</Text>
       {userData ? (
         <View style={styles.profileContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate('Dados')}>
-            <Text style={styles.label}>Informações Sobre a Conta</Text>
-            <Text style={styles.value}>{userData.name}</Text>
-          </TouchableOpacity>
+          <Text style={styles.label}>Nome:</Text>
+          <Text style={styles.value}>{userData.name}</Text>
 
-          <TouchableOpacity onPress={() => copyToClipboard('brainlinker06@gmail.com')}>
-            <Text style={styles.label}>Contato</Text>
-            <Text style={styles.value}>brainlinker06@gmail.com</Text>
-          </TouchableOpacity>
-          {copiedMessage ? <Text style={styles.copiedMessage}>{copiedMessage}</Text> : null}
+          <Text style={styles.label}>Email:</Text>
+          <Text style={styles.value}>{userData.email}</Text>
+
+          <Text style={styles.label}>Tipo de Usuário:</Text>
+          <Text style={styles.value}>{userData.userType}</Text>
+
+          {userData.relation && (
+            <>
+              <Text style={styles.label}>Relação:</Text>
+              <Text style={styles.value}>{userData.relation}</Text>
+            </>
+          )}
         </View>
       ) : (
         <Text style={styles.errorMessage}>Não foi possível carregar os dados do usuário.</Text>
@@ -79,4 +77,4 @@ const User = () => {
   );
 };
 
-export default User;
+export default Dados;

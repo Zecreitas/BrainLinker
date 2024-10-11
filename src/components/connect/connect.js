@@ -1,60 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './style';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 const Connect = () => {
-  const route = useRoute();
   const navigation = useNavigation();
   const [emailCuidador, setEmailCuidador] = useState('');
   const [token, setToken] = useState('');
+  const [userId, setUserId] = useState(''); 
+  const [destinatarioId, setDestinatarioId] = useState('');
+  const [errorMessage, setErrorMessage] = useState(''); // Estado para mensagem de erro
 
+  // Obtém o token e o userId do AsyncStorage
   useEffect(() => {
-    if (route.params?.token) {
-      setToken(route.params.token);
-    } else {
-      AsyncStorage.getItem('token').then(storedToken => {
-        setToken(storedToken || '');
-      });
-    }
-  }, [route.params?.token]);
+    const getTokenAndUserId = async () => {
+      const storedToken = await AsyncStorage.getItem('token');
+      const storedUserId = await AsyncStorage.getItem('userId');
+      setToken(storedToken || '');
+      setUserId(storedUserId || '');
+    };
+    getTokenAndUserId();
+  }, []);
 
   const conectar = async () => {
     try {
       if (!token) {
-        Alert.alert('Erro', 'Usuário não autenticado. Por favor, faça login novamente.');
+        setErrorMessage('Usuário não autenticado. Por favor, faça login novamente.');
         return;
       }
-  
+
       const response = await fetch('http://192.168.100.21:3000/api/conectar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ emailCuidador })
+        body: JSON.stringify({ emailCuidador }),
       });
-  
-      const result = await response.json();
 
-  
+      const result = await response.json();
+      console.log('API Response:', result);
+
       if (response.ok) {
-        Alert.alert('Conectado com sucesso!', `ID da conexão: ${result.conexoes}`);
-        
-        // Armazene as conexões no AsyncStorage
-        await AsyncStorage.setItem('connectionId', JSON.stringify(result.conexoes[0]));
-  
-        navigation.navigate('Inicio', { token });
-      } else {
-        Alert.alert('Erro ao conectar', result.message || 'Ocorreu um erro inesperado.');
-        if (result.message === 'Já está conectado com este cuidador') {
-          navigation.navigate('Inicio', { token });
+        if (result.conexoes && result.conexoes.length > 0) {
+          const connectionId = result.conexoes[result.conexoes.length - 1];
+          console.log('Connection ID:', connectionId);
+          console.log('Remetente ID (userId):', userId);
+
+          if (userId && connectionId) {
+            // Salva os IDs no AsyncStorage
+            await AsyncStorage.setItem('remetenteId', userId);
+            await AsyncStorage.setItem('destinatarioId', connectionId);
+            await AsyncStorage.setItem('emailCuidador', emailCuidador); 
+            console.log('Remetente e destinatário salvos:', userId, connectionId);
+
+            setErrorMessage(''); // Limpa a mensagem de erro ao conectar com sucesso
+            navigation.navigate('Inicio', { token, remetenteId: userId, destinatarioId: connectionId });
+          } else {
+            setErrorMessage('Não foi possível salvar os IDs de remetente e destinatário.');
+          }
         }
+      } else if (result.message === 'Já está conectado com este cuidador') {
+        setErrorMessage('');
+        const remetenteId = await AsyncStorage.getItem('userId');
+        const connectionId = await AsyncStorage.getItem('destinatarioId');
+        console.log('Remetente e destinatário recuperados:', remetenteId, connectionId);
+
+        // Navega para a próxima tela com os IDs
+        navigation.navigate('Inicio', { token, remetenteId, destinatarioId: connectionId });
+      } else {
+        setErrorMessage(result.message || 'Ocorreu um erro inesperado.');
       }
     } catch (error) {
-      console.error(error);
-      Alert.alert('Erro', 'Não foi possível conectar. Verifique sua conexão e tente novamente.');
+      console.error('Erro na conexão:', error);
+      setErrorMessage('Não foi possível conectar. Verifique sua conexão e tente novamente.');
     }
   };
 
@@ -74,6 +94,9 @@ const Connect = () => {
       <TouchableOpacity onPress={conectar} style={styles.buttonPesq}>
         <Text style={styles.text}>Buscar</Text>
       </TouchableOpacity>
+
+      {/* Exibe mensagem de erro em vermelho, se houver */}
+      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
   );
 };

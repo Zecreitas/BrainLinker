@@ -71,6 +71,12 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         color: 'white',
     },
+    error: {
+        color: 'red',
+        marginTop: 10,
+        textAlign: 'center',
+        fontSize: 16
+    },
 });
 
 export default styles

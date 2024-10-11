@@ -59,7 +59,12 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: 18
     },
-
+    error: {
+        color: 'red',
+        marginTop: 10,
+        textAlign: 'center',
+        fontSize: 16
+    },
   });
 
 export default styles

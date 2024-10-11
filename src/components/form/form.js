@@ -10,6 +10,7 @@ const Logo = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [senhaVisible, setSenhaVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); // Novo estado para armazenar o erro
   const navigation = useNavigation();
 
   const toggleSenha = () => {
@@ -25,14 +26,14 @@ const Logo = () => {
       if (token && user) {
         await AsyncStorage.setItem('token', token);
         await AsyncStorage.setItem('user', JSON.stringify(user));
-  
+
         navigation.navigate('Connect');
       } else {
-        alert('Dados de login inválidos');
+        setErrorMessage('Dados de login inválidos'); 
       }
     } catch (error) {
       console.error('Erro ao fazer login:', error.response ? error.response.data : error.message);
-      alert('Erro ao fazer login. Verifique suas credenciais e tente novamente.');
+      setErrorMessage('Erro ao fazer login. Verifique suas credenciais e tente novamente.'); 
     }
   };
 
@@ -67,9 +68,12 @@ const Logo = () => {
           />
         </TouchableOpacity>
       </View>
+
       <TouchableOpacity style={styles.login} onPress={handleLogin}>
         <Text style={styles.text}>Login</Text>
       </TouchableOpacity>
+
+      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
   );
 };

@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 30,
+        marginTop: 200,
         alignSelf: 'center',
     },
     tcad:{
@@ -34,6 +34,13 @@ const styles = StyleSheet.create({
     },
     tcolor:{
         color: 'black',
+        fontSize: 15,
+        fontWeight: 'bold',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textoCad:{
+        color: '#00BBF5',
         fontSize: 15,
         fontWeight: 'bold',
         alignItems: 'center',

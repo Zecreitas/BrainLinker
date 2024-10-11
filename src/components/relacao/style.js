@@ -43,6 +43,12 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         fontSize: 15,
     },
+    error: {
+        color: 'red',
+        marginTop: 10,
+        textAlign: 'center',
+        fontSize: 16,
+    },
 });
 
 export default styles
