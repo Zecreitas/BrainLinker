@@ -5,12 +5,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const Logo = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [senhaVisible, setSenhaVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(''); // Novo estado para armazenar o erro
+  const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation();
 
   const toggleSenha = () => {
@@ -20,14 +22,19 @@ const Logo = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.post('http://192.168.100.21:3000/api/login', { email, password });
-
+  
       const { token, user } = response.data;
-
+  
       if (token && user) {
         await AsyncStorage.setItem('token', token);
-        await AsyncStorage.setItem('user', JSON.stringify(user));
+        await AsyncStorage.setItem('userId', user.id.toString());
+        await AsyncStorage.setItem('userType', user.userType);
 
-        navigation.navigate('Connect');
+        if (user.userType === 'cuidador') {
+          navigation.navigate('Inicio'); 
+        } else {
+          navigation.navigate('Connect');
+        }
       } else {
         setErrorMessage('Dados de login inválidos'); 
       }
@@ -36,6 +43,7 @@ const Logo = () => {
       setErrorMessage('Erro ao fazer login. Verifique suas credenciais e tente novamente.'); 
     }
   };
+  
 
   return (
     <View>
@@ -61,8 +69,8 @@ const Logo = () => {
           placeholderTextColor={'white'}
         />
         <TouchableOpacity onPress={toggleSenha} style={styles.toggle}>
-          <Icon
-            name={senhaVisible ? 'visibility' : 'visibility-off'}
+          <MaterialCommunityIcons
+            name={senhaVisible ? 'eye' : 'eye-off'}
             size={24}
             color="#fff"
           />

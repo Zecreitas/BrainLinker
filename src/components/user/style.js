@@ -52,6 +52,21 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 14,
   },
+  logoutButton: {
+    backgroundColor: "#092845",
+    width: 160,
+    height: 45,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginTop: 30,
+  },
+  logout:{
+    color: 'white',
+    fontSize: 22,
+    alignSelf: 'center',
+  }
 });
 
 export default styles;

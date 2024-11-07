@@ -10,9 +10,8 @@ const Connect = () => {
   const [token, setToken] = useState('');
   const [userId, setUserId] = useState(''); 
   const [destinatarioId, setDestinatarioId] = useState('');
-  const [errorMessage, setErrorMessage] = useState(''); // Estado para mensagem de erro
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // Obtém o token e o userId do AsyncStorage
   useEffect(() => {
     const getTokenAndUserId = async () => {
       const storedToken = await AsyncStorage.getItem('token');
@@ -40,22 +39,16 @@ const Connect = () => {
       });
 
       const result = await response.json();
-      console.log('API Response:', result);
-
       if (response.ok) {
         if (result.conexoes && result.conexoes.length > 0) {
           const connectionId = result.conexoes[result.conexoes.length - 1];
-          console.log('Connection ID:', connectionId);
-          console.log('Remetente ID (userId):', userId);
 
           if (userId && connectionId) {
-            // Salva os IDs no AsyncStorage
             await AsyncStorage.setItem('remetenteId', userId);
             await AsyncStorage.setItem('destinatarioId', connectionId);
             await AsyncStorage.setItem('emailCuidador', emailCuidador); 
-            console.log('Remetente e destinatário salvos:', userId, connectionId);
 
-            setErrorMessage(''); // Limpa a mensagem de erro ao conectar com sucesso
+            setErrorMessage('');
             navigation.navigate('Inicio', { token, remetenteId: userId, destinatarioId: connectionId });
           } else {
             setErrorMessage('Não foi possível salvar os IDs de remetente e destinatário.');
@@ -65,9 +58,7 @@ const Connect = () => {
         setErrorMessage('');
         const remetenteId = await AsyncStorage.getItem('userId');
         const connectionId = await AsyncStorage.getItem('destinatarioId');
-        console.log('Remetente e destinatário recuperados:', remetenteId, connectionId);
 
-        // Navega para a próxima tela com os IDs
         navigation.navigate('Inicio', { token, remetenteId, destinatarioId: connectionId });
       } else {
         setErrorMessage(result.message || 'Ocorreu um erro inesperado.');
@@ -95,7 +86,6 @@ const Connect = () => {
         <Text style={styles.text}>Buscar</Text>
       </TouchableOpacity>
 
-      {/* Exibe mensagem de erro em vermelho, se houver */}
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
   );

@@ -2,41 +2,44 @@ import React, { useEffect, useState } from 'react';
 import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './style';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const Dados = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const carregarDadosUsuario = async () => {
-      try {
-        const storedToken = await AsyncStorage.getItem('token');
-        const userId = await AsyncStorage.getItem('userId');
+  const carregarDadosUsuario = async () => {
+    try {
+      const storedToken = await AsyncStorage.getItem('token');
+      const userId = await AsyncStorage.getItem('userId');
+      
+      if (storedToken && userId) {
+        const response = await axios.get(`http://192.168.100.21:3000/api/user/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${storedToken}`,
+          },
+        });
         
-        if (storedToken && userId) {
-          const response = await axios.get(`http://192.168.100.21:3000/api/user/${userId}`, {
-            headers: {
-              'Authorization': `Bearer ${storedToken}`,
-            },
-          });
-          
-          if (response.status === 200) {
-            setUserData(response.data);
-          }
+        if (response.status === 200) {
+          setUserData(response.data);
         }
-      } catch (error) {
-        console.error('Erro ao carregar dados do usuário:', error);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error('Erro ao carregar dados do usuário:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    carregarDadosUsuario();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      carregarDadosUsuario(); 
+    }, [])
+  );
 
   if (loading) {
     return (
@@ -48,8 +51,8 @@ const Dados = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Icon name="arrow-back" size={30} color="#000" />
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.voltarButton}>
+        <MaterialCommunityIcons name="arrow-left" size={30} color="black" style={{ marginTop: 5 }} />
       </TouchableOpacity>
 
       {userData ? (
@@ -70,9 +73,17 @@ const Dados = () => {
             </>
           )}
         </View>
+        
       ) : (
         <Text style={styles.errorMessage}>Não foi possível carregar os dados do usuário.</Text>
+        
       )}
+      <TouchableOpacity 
+        onPress={() => navigation.navigate('EditarDados')}
+        style={styles.editButton}
+      >
+        <Text style={styles.editButtonText}>Editar Dados</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };

@@ -1,201 +1,203 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, ScrollView, TouchableOpacity, Alert, Image, TextInput, ActivityIndicator } from 'react-native';
+import { Text, View, ScrollView, TouchableOpacity, Alert, Image, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import styles from './style';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Midia = () => {
-  const [midia, setMidia] = useState(null);
-  const [descricao, setDescricao] = useState('');
-  const [token, setToken] = useState('');
-  const [remetenteId, setRemetenteId] = useState('');
-  const [destinatarioId, setDestinatarioId] = useState('');
   const [midias, setMidias] = useState([]);
-  const [loading, setLoading] = useState(true); 
-  const [connectionId, setConnectionId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState('');
+  const [isCuidador, setIsCuidador] = useState(false);
+  const [contatos, setContatos] = useState([]);
 
   const navigation = useNavigation();
 
-
   useEffect(() => {
-    const carregarDados = async () => {
+    const carregarToken = async () => {
       try {
-        const storedConnectionId = await AsyncStorage.getItem('connectionId');
         const storedToken = await AsyncStorage.getItem('token');
-        const storedRemetenteId = await AsyncStorage.getItem('remetenteId');
-        const storedDestinatarioId = await AsyncStorage.getItem('destinatarioId');
-
-        if (storedConnectionId) setConnectionId(storedConnectionId);
-        if (storedToken) setToken(storedToken);
-        if (storedRemetenteId) setRemetenteId(storedRemetenteId);
-        if (storedDestinatarioId) setDestinatarioId(storedDestinatarioId);
+        if (storedToken) {
+          setToken(storedToken);
+        }
       } catch (error) {
-        console.error('Erro ao carregar dados:', error);
+        console.error('Erro ao carregar o token:', error);
       }
     };
-
-    carregarDados();
+    carregarToken();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      if (token) {
+        carregarMidias();
+        if (isCuidador) {
+          carregarContatos();
+        }
+      }
+    }, [token, isCuidador])
+  );
+
   useEffect(() => {
-    if (token && connectionId) {
-      carregarMidias();
-    }
-  }, [token, connectionId]);
-
-  const selecionarMidia = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
-    if (status !== 'granted') {
-      Alert.alert('Permissão negada', 'Precisamos de permissão para acessar suas fotos.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setMidia(result.assets[0]);
-    }
-  };
-
-  const enviarMidia = async () => {
-    if (!token || !remetenteId || !destinatarioId) {
-      Alert.alert('Erro', 'Token ou remetente/destinatário não encontrado. Por favor, faça login novamente.');
-      return;
-    }
-  
-    if (!midia) {
-      Alert.alert('Erro', 'Nenhuma mídia selecionada');
-      return;
-    }
-  
-    const midiaUri = midia.uri.startsWith('file://') ? midia.uri : `file://${midia.uri}`;
-  
-    try {
-      const formData = new FormData();
-      formData.append('file', {
-        uri: midiaUri,
-        type: midia.type || 'image/jpeg',
-        name: midia.fileName || 'imagem.jpg',
-      });
-      formData.append('tipo', 'foto');
-      formData.append('descricao', descricao);
-      formData.append('remetenteId', remetenteId);
-      formData.append('destinatarioId', destinatarioId);
-  
-      console.log('Dados a serem enviados:', {
-        uri: midiaUri,
-        type: midia.type || 'image/jpeg',
-        name: midia.fileName || 'imagem.jpg',
-        tipo: 'foto',
-        descricao,
-        remetenteId,
-        destinatarioId,
-      });
-  
-      const response = await axios.post('http://192.168.100.21:3000/api/upload-midia', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`,
-        },
-        timeout: 5000,
-      });
-  
-      console.log('Resposta do servidor:', response);
-  
-      if (response.status === 200) {
-        Alert.alert('Sucesso', 'Mídia enviada com sucesso!');
-        setMidia(null);
-        setDescricao('');
-      } else {
-        Alert.alert('Erro', 'Falha ao enviar a mídia');
+    const carregarUserType = async () => {
+      try {
+        let storedUserType = await AsyncStorage.getItem('userType');
+        if (!storedUserType) {
+          await AsyncStorage.setItem('userType', 'familiar/amigo');
+          storedUserType = 'familiar/amigo';
+        }
+        setIsCuidador(storedUserType === 'cuidador');
+      } catch (error) {
+        console.error('Erro ao carregar ou definir o userType:', error);
       }
-    } catch (error) {
-      if (error.response) {
-        console.error('Erro no servidor:', error.response.data);
-        Alert.alert('Erro no servidor', error.response.data.message || 'Ocorreu um erro ao enviar a mídia');
-      } else if (error.request) {
-        console.error('Sem resposta do servidor:', error.request);
-        Alert.alert('Erro', 'Sem resposta do servidor');
-      } else {
-        console.error('Erro desconhecido:', error.message);
-        Alert.alert('Erro', error.message);
-      }
-    }
-  };  
+    };
+    carregarUserType();
+  }, []);
 
   const carregarMidias = async () => {
     try {
-      setLoading(true); 
-      const cleanedConnectionId = connectionId.replace(/"/g, '');
-      const response = await axios.get(`http://192.168.100.21:3000/api/midias/${cleanedConnectionId}`, {
+      setLoading(true);
+      const response = await axios.get('http://192.168.100.21:3000/api/midias', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
   
       if (response.status === 200) {
-        setMidias(response.data);
+        const midiasOrdenadas = response.data
+          .sort((a, b) => new Date(b.dataEnvio) - new Date(a.dataEnvio))
+          .filter((midia, index, self) => 
+            index === self.findIndex((m) => new Date(m.dataEnvio).getTime() === new Date(midia.dataEnvio).getTime())
+          );
+  
+        setMidias(midiasOrdenadas);
       } else {
         Alert.alert('Erro', 'Não foi possível carregar as mídias');
       }
     } catch (error) {
       console.error('Erro ao carregar as mídias:', error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
+  };
+  
+  const carregarContatos = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('http://192.168.100.21:3000/api/contatos-midias', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        setContatos(response.data);
+      } else {
+        Alert.alert('Erro', 'Não foi possível carregar os contatos de mídias');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar os contatos de mídias:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatarDataEnvio = (dataEnvio) => {
+    const agora = new Date();
+    const data = new Date(dataEnvio);
+    const diffDias = Math.floor((agora - data) / (1000 * 60 * 60 * 24));
+
+    if (diffDias === 0) return 'Hoje';
+    if (diffDias === 1) return 'Ontem';
+    if (diffDias <= 3) return `${diffDias} dias atrás`;
+    if (diffDias <= 7) return '1 semana atrás';
+    if (diffDias <= 21) return '3 semanas atrás';
+    return data.toLocaleDateString();
+  };
+
+  const calculateAge = (nascDate) => {
+    const today = new Date();
+    const birthDate = new Date(nascDate);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const formatSendTime = (dateString) => {
+    const date = new Date(dateString);
+    date.setHours(date.getHours() - 3); 
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
   };
 
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.nav}>
-      <TouchableOpacity style={styles.user}
-          onPress={() => navigation.navigate('User')}
+        <TouchableOpacity style={styles.user}
+            onPress={() => navigation.navigate('User')}
         >
           <MaterialCommunityIcons name="account-circle" color="white" size={44} />
           <Text style={styles.userText}>Usuário</Text>
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
-        <Text style={styles.selecText}>Toque para enviar uma mídia</Text>
-        {midia && <Image source={{ uri: midia.uri }} style={styles.imagemSelec} />}
-
-        <TouchableOpacity onPress={selecionarMidia} style={styles.botao}>
-          <MaterialCommunityIcons name="plus" color="white" size={50} alignSelf="center" marginTop={5} />
-        </TouchableOpacity>
-
-        <Text style={styles.textDesc}>Descrição da mídia:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite uma descrição..."
-          value={descricao}
-          onChangeText={setDescricao}
-        />
-
-        <TouchableOpacity onPress={enviarMidia} style={styles.botaoEnviar}>
-          <Text style={styles.botaoTexto}>Enviar Mídia</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.textEnvi}>Mídias já enviadas</Text>
-        {loading ? (
-          <ActivityIndicator size="large" color="#06C8F2" style={{ marginTop: 20 }} />
+        {isCuidador ? (
+          <>
+            <Text style={styles.textEnvi}>Lista de Contatos</Text>
+            {loading ? (
+              <ActivityIndicator size="large" color="#06C8F2" style={{ marginTop: 20 }} />
+            ) : (
+              contatos.map((contato) => (
+                <TouchableOpacity 
+                  key={contato._id} 
+                  style={styles.contatoCard}
+                  onPress={() => navigation.navigate('ChatMidias', { contatoId: contato._id })}
+                >
+                  <View style={styles.contatoInfoContainer}>
+                    <Text style={styles.contatoNome}>{contato.name}</Text>
+                    <Text style={styles.contatoInfo}>{contato.relation}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
+          </>
         ) : (
-          midias.map((midia) => (
-            <View key={midia._id} style={[styles.midiaCard]}>
-              <Image
-                source={{ uri: `http://192.168.100.21:3000/${midia.caminho.replace(/\\/g, '/')}` }}
-                style={styles.midiaImage}
-              />
-              <Text style={styles.midiaDescription}>{midia.descricao}</Text>
-            </View>
-          ))
+          <>
+            <Text style={styles.selecText}>Adicionar Midia</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('SelecionarMidia')} style={styles.botao}>
+              <MaterialCommunityIcons name="plus" color="white" size={50} marginTop={5} />
+            </TouchableOpacity>
+  
+            <Text style={styles.textEnvi}>Mídias já enviadas</Text>
+            {loading ? (
+              <ActivityIndicator size="large" color="#06C8F2" style={{ marginTop: 20 }} />
+            ) : (
+              midias.map((midia) => (
+                <View key={midia._id} style={styles.midiaCard}>
+                  <View style={styles.midiaInfoContainer}>
+                    <Text style={styles.senderName}>{midia.remetente.name}</Text>
+                    <View style={styles.senderDetails}>
+                      <Text style={styles.senderRelation}>{midia.remetente.relation},</Text>
+                      <Text style={styles.senderAge}>{calculateAge(midia.remetente.nascDate)} anos</Text>
+                    </View>
+                    <Text style={styles.sendTime}>{formatarDataEnvio(midia.dataEnvio)} às {formatSendTime(midia.dataEnvio)}</Text>
+                  </View>
+                  <Image
+                    source={{ uri: `http://192.168.100.21:3000/${midia.caminho.replace(/\\/g, '/')}` }}
+                    style={styles.midiaImage}
+                  />
+                  <Text style={styles.midiaDescription}>{midia.descricao}</Text>
+                </View>
+              ))
+            )}
+          </>
         )}
       </ScrollView>
     </View>

@@ -91,44 +91,23 @@ const styles = StyleSheet.create({
         color: '#888',
         textAlign: 'right',
       },
-      contatosContainer: {
-        padding: 10,
+      voltarButton: {
+        marginRight: 10,
       },
-      contatoCard: {
-        backgroundColor: '#ffffff',
-        padding: 15,
-        borderRadius: 10,
-        marginBottom: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 3,
+      dataContainer: {
+        marginVertical: 10,
       },
-      contatoNome: {
-        fontSize: 16,
+      dataTitulo: {
+        fontSize: 15,
         fontWeight: 'bold',
-        color: '#092845',
-      },
-      contatoInfo: {
-        fontSize: 14,
-        color: '#666666',
-      },
-      semContatos: {
-        textAlign: 'center',
-        fontSize: 16,
-        color: '#999999',
-        marginTop: 20,
-      },
-      ultimaMensagem: {
-        fontSize: 14,
         color: '#555',
-        marginTop: 4,
+        marginVertical: 5,
+        textAlign: 'center',
       },
-      dataMensagem: {
-        fontSize: 12,
-        color: '#888',
-        marginTop: 2,
+      linhaSeparacao: {
+        height: 1,
+        backgroundColor: 'rgba(216, 223, 229, 100)', 
+        marginVertical: 10, 
       },
 });
 

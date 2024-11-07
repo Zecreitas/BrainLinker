@@ -15,7 +15,7 @@ const Cad = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [senhaVisible, setSenhaVisible] = useState(false);
-    const [errorMessage, setErrorMessage] = useState(''); // Novo estado para mensagem de erro
+    const [errorMessage, setErrorMessage] = useState('');
 
     const toggleSenha = () => {
       setSenhaVisible(!senhaVisible);
@@ -34,7 +34,7 @@ const Cad = () => {
             alert('Cadastro realizado com sucesso');
             navigation.navigate('Connect');
         } catch (error) {
-            setErrorMessage('Cadastro falhou. Verifique os dados e tente novamente.'); // Define a mensagem de erro
+            setErrorMessage('Cadastro falhou. Verifique os dados e tente novamente.'); 
             console.error(error);
         }
     };
@@ -88,7 +88,7 @@ const Cad = () => {
           <Text style={styles.text}>Cadastrar-se</Text>
         </TouchableOpacity>
 
-        {/* Exibe mensagem de erro em vermelho, se houver */}
+
         {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
     </View>
