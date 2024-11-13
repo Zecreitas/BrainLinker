@@ -104,7 +104,7 @@ const Mensagens = () => {
               <Text style={styles.contatoNome}>{contato.name}</Text>
               <Text style={styles.contatoInfo}>
                 {contato.relation}
-                {userType === 'cuidador' && `, ${contato.age} anos`}
+                {userType === 'cuidador' && `, ${contato.age-1} anos`}
               </Text>
               <Text style={styles.ultimaMensagem}>
                 {contato.ultimaMensagem?.texto || 'Sem mensagens ainda'}

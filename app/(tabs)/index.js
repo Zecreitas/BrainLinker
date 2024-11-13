@@ -17,7 +17,6 @@ import Dados from '../../src/components/dados/dados';
 import EditarDados from '../../src/components/editarDados/editarDados';
 import SelecionarMidia from '../../src/components/selecionarMidia/selecionarMidia';
 import Chat from '../../src/components/chat/chat';
-import Letra from '../../src/components/letra/letra';
 import ChatMidias from '../../src/components/chatmidias/chatmidias';
 
 const Stack = createNativeStackNavigator();
@@ -40,7 +39,6 @@ const YourApp = () => {
         <Stack.Screen name="EditarDados" component={EditarDados} />
         <Stack.Screen name="SelecionarMidia" component={SelecionarMidia} />
         <Stack.Screen name="Chat" component={Chat} />
-        <Stack.Screen name="Letra" component={Letra} />
         <Stack.Screen name="ChatMidias" component={ChatMidias} />
       </Stack.Navigator>
   );

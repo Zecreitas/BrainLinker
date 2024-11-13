@@ -65,48 +65,64 @@ const Inicio = () => {
   const [token, setToken] = useState('');
   const [connectionId, setConnectionId] = useState('');
   const [userType, setUserType] = useState('');
+  
   const navigation = useNavigation();
 
   useEffect(() => {
     const carregarDados = async () => {
       try {
         const storedToken = await AsyncStorage.getItem('token');
-        const storedConnectionId = await AsyncStorage.getItem('connectionId');
-        const storedUserType = await AsyncStorage.getItem('userType');
+        const storedConnectionId = await AsyncStorage.getItem('destinatarioId');
+        const storedUserType = await AsyncStorage.getItem('userType'); 
+  
+  
+        if (storedToken) setToken(storedToken);
+        if (storedConnectionId) setConnectionId(storedConnectionId.replace(/"/g, '').trim());
+        if (storedUserType) setUserType(storedUserType.replace(/"/g, '').trim());
 
-        if (storedToken && storedConnectionId) {
-          setToken(storedToken);
-          setConnectionId(storedConnectionId);
-          setUserType(storedUserType);
-        }
+        console.log('Token:', storedToken);
+        console.log('Connection ID:', storedConnectionId);
+        console.log('User Type:', storedUserType);
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
       }
     };
-
+  
     carregarDados();
   }, []);
+  
 
   useEffect(() => {
     const carregarNotificacoes = async () => {
       setLoadingNotificacoes(true);
       try {
-        const cleanedConnectionId = connectionId.replace(/"/g, '').trim();
-        const responseMensagens = await axios.get(
-          `http://192.168.100.21:3000/api/mensagens-naolidas/${cleanedConnectionId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        let todasNotificacoes = responseMensagens.data;
-
+        let todasNotificacoes = [];
+  
         if (userType === 'cuidador') {
-          const responseMidias = await axios.get(
-            `http://192.168.100.21:3000/api/midias-semana/${cleanedConnectionId}`,
+          const responseMensagens = await axios.get(
+            `http://192.168.100.21:3000/api/mensagens-naolidas`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
-          todasNotificacoes = [...todasNotificacoes, ...responseMidias.data];
+          const responseMidias = await axios.get(
+            `http://192.168.100.21:3000/api/midias-semana`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          todasNotificacoes = [...responseMensagens.data, ...responseMidias.data];
+        } if (userType === 'familiar/amigo') {
+          try {
+            console.log("Connection ID:", connectionId);
+            console.log("Token:", token);
+        
+            const responseMensagens = await axios.get(
+              `http://192.168.100.21:3000/api/mensagens-naolidas/${connectionId}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            todasNotificacoes = [...responseMensagens.data];
+          } catch (error) {
+            console.error('Erro ao carregar notificações para familiar/amigo:', error.message);
+          }
         }
-
+  
         todasNotificacoes.sort((a, b) => new Date(b.dataEnvio) - new Date(a.dataEnvio));
         setNotificacoes(todasNotificacoes);
       } catch (error) {
@@ -115,11 +131,13 @@ const Inicio = () => {
         setLoadingNotificacoes(false);
       }
     };
-
-    if (token && connectionId) {
+  
+    if (token && (userType === 'cuidador' || (connectionId && connectionId.trim() !== ''))) {
       carregarNotificacoes();
     }
   }, [token, connectionId, userType]);
+  
+  
 
   const marcarMensagemComoLida = async (mensagemId) => {
     try {
@@ -132,6 +150,19 @@ const Inicio = () => {
       console.error('Erro ao marcar mensagem como lida:', error.response ? error.response.data : error.message);
     }
   };
+
+  const marcarMidiaComoLida = async (midiaId) => {
+    try {
+      await axios.put(
+        `http://192.168.100.21:3000/api/marcar-midia-como-lida/${midiaId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (error) {
+      console.error('Erro ao marcar mídia como lida:', error.response ? error.response.data : error.message);
+    }
+  };
+  
 
   const formatarDataEnvio = (dataEnvio) => {
     const agora = new Date();
@@ -179,23 +210,29 @@ const Inicio = () => {
         <Text style={styles.sectionTitle}>Notificações</Text>
         {notificacoes.map((notificacao) => (
           <TouchableOpacity
-          key={notificacao._id}
-          onPress={async () => {
-            if (!notificacao.caminho) {
-              await marcarMensagemComoLida(notificacao._id);
-              navigation.navigate('Chat', {
-                connectionId: notificacao.destinatario,
-                mensagemId: notificacao._id,
-              });
-            } else {
-              navigation.navigate('Midia', { mediaId: notificacao._id });
-            }
-            setNotificacoes((prevNotificacoes) =>
-              prevNotificacoes.filter((n) => n._id !== notificacao._id)
-            );
-          }}
-        >
-          
+            key={notificacao._id}
+            onPress={async () => {
+              try {
+                if (!notificacao.caminho) {
+                  await marcarMensagemComoLida(notificacao._id);
+                  
+                  const chatConnectionId = userType === 'cuidador' ? notificacao.remetente : notificacao.destinatario;
+                  navigation.navigate('Chat', { connectionId: chatConnectionId });
+                } else {
+                  await marcarMidiaComoLida(notificacao._id);
+
+                  const chatConnectionId = userType === 'cuidador' ? notificacao.remetente._id : connectionId;
+                  navigation.navigate('ChatMidias', { connectionId: chatConnectionId });
+                }
+
+                setNotificacoes((prevNotificacoes) =>
+                  prevNotificacoes.filter((n) => n._id !== notificacao._id)
+                );
+              } catch (error) {
+                console.error('Erro ao navegar:', error.message);
+              }
+            }}
+          > 
             <View style={notificacao.caminho ? styles.midiaCard : styles.mensagemCard}>
               <Text style={styles.mensPass}>{formatarDataEnvio(notificacao.dataEnvio)}</Text>
 

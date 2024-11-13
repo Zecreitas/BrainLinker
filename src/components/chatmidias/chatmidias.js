@@ -1,18 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  Modal,
+} from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
-import styles from './style';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import styles from './style';
 
 const ChatMidias = () => {
   const [midias, setMidias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
   const route = useRoute();
   const navigation = useNavigation();
-  const { contatoId } = route.params;
+  const { connectionId } = route.params;
 
   useEffect(() => {
     const carregarToken = async () => {
@@ -21,7 +32,7 @@ const ChatMidias = () => {
         if (storedToken) {
           setToken(storedToken);
         } else {
-          console.log('Nenhum token encontrado'); 
+          console.log('Nenhum token encontrado');
         }
       } catch (error) {
         console.error('Erro ao carregar o token:', error);
@@ -32,32 +43,32 @@ const ChatMidias = () => {
 
   useEffect(() => {
     const carregarMidiasContato = async () => {
-      if (token && contatoId) {
+      if (token && connectionId) {
+        console.log('Token:', token, 'Contato ID:', connectionId);
         try {
           setLoading(true);
-          const response = await axios.get(`http://192.168.100.21:3000/api/midias/contato/${contatoId}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
+          const response = await axios.get(`http://192.168.100.21:3000/api/midias/contato/${connectionId}`, {
+            headers: { Authorization: `Bearer ${token}` },
           });
-
+          console.log('Resposta da API:', response.data);
+  
           if (response.status === 200) {
             setMidias(response.data);
           } else {
             Alert.alert('Erro', 'Não foi possível carregar as mídias do contato');
           }
         } catch (error) {
-          console.error('Erro ao carregar as mídias do contato:', error);
+          console.error('Erro ao carregar as mídias do contato:', error.response ? error.response.data : error.message);
         } finally {
           setLoading(false);
         }
       } else {
-        console.log('Token ou contatoId não definidos. Token:', token, 'contatoId:', contatoId);
+        console.log('Token ou contatoId não definidos:', token, connectionId);
       }
     };
     carregarMidiasContato();
-  }, [token, contatoId]);
-
+  }, [token, connectionId]);
+  
   const calcularIdade = (dataNasc) => {
     const nascimento = new Date(dataNasc);
     const hoje = new Date();
@@ -67,6 +78,16 @@ const ChatMidias = () => {
       idade--;
     }
     return idade;
+  };
+
+  const openModal = (imageUri) => {
+    setSelectedImage(imageUri);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setSelectedImage(null);
   };
 
   return (
@@ -79,7 +100,11 @@ const ChatMidias = () => {
           <ActivityIndicator size="large" color="#06C8F2" />
         ) : midias.length > 0 ? (
           midias.map((midia) => (
-            <View key={midia._id} style={styles.midiaCard}>
+            <TouchableOpacity
+              key={midia._id}
+              onPress={() => openModal(`http://192.168.100.21:3000/${midia.caminho.replace(/\\/g, '/')}`)}
+              style={styles.midiaCard}
+            >
               <Image
                 source={{ uri: `http://192.168.100.21:3000/${midia.caminho.replace(/\\/g, '/')}` }}
                 style={styles.midiaImage}
@@ -93,12 +118,23 @@ const ChatMidias = () => {
                   timeZone: 'America/Sao_Paulo',
                 })}
               </Text>
-            </View>
+            </TouchableOpacity>
           ))
         ) : (
           <Text style={styles.noMidiaText}>Nenhuma mídia encontrada para este contato.</Text>
         )}
       </ScrollView>
+
+      <Modal visible={isModalVisible} transparent={true} animationType="fade">
+        <View style={styles.modalContainer}>
+          <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+            <MaterialCommunityIcons name="close" size={30} color="#fff" />
+          </TouchableOpacity>
+          {selectedImage && (
+            <Image source={{ uri: selectedImage }} style={styles.fullScreenImage} resizeMode="contain" />
+          )}
+        </View>
+      </Modal>
     </View>
   );
 };

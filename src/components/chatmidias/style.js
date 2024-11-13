@@ -206,6 +206,24 @@ const styles = StyleSheet.create({
         color: '#092845',
         marginTop: 10,
       },
+      backButton: {
+        padding: 10,
+      },
+      modalContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      fullScreenImage: {
+        width: '90%',
+        height: '80%',
+      },
+      closeButton: {
+        position: 'absolute',
+        top: 30,
+        right: 20,
+      },
 });
 
 export default styles

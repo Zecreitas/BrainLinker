@@ -48,17 +48,24 @@ const User = () => {
   };
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('token');
-    await AsyncStorage.removeItem('userId');
-    await AsyncStorage.removeItem('userType');
-
-    setUserData(null);
-
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
+    try {
+      await AsyncStorage.multiRemove([
+        'token',
+        'userId',
+        'userType',
+      ]);
+  
+      setUserData(null);
+  
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Carregamento' }],
+      });
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
   };
+  
 
   if (loading) {
     return (
@@ -85,11 +92,6 @@ const User = () => {
           <TouchableOpacity onPress={() => copyToClipboard('brainlinker06@gmail.com')}>
             <Text style={styles.label}>Contato</Text>
             <Text style={styles.value}>brainlinker06@gmail.com</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => navigation.navigate('Letra')}>
-            <Text style={styles.label}>Tamanho das letras</Text>
-            <Text style={styles.value}>100%</Text>
           </TouchableOpacity>
           
           {copiedMessage ? <Text style={styles.copiedMessage}>{copiedMessage}</Text> : null}

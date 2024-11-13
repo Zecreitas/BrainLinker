@@ -22,22 +22,32 @@ const Cad = () => {
     };
 
     const handleCadastro = async () => {
-        try {
-            const response = await api.post('/cadastro', {
-                name,
-                email,
-                password,
-                userType,
-                relation: userType === 'familiar/amigo' ? relation : '',
-                nascDate: userType === 'familiar/amigo' ? nascDate : '',
-            });
-            alert('Cadastro realizado com sucesso');
-            navigation.navigate('Connect');
-        } catch (error) {
-            setErrorMessage('Cadastro falhou. Verifique os dados e tente novamente.'); 
-            console.error(error);
-        }
-    };
+      try {
+          const response = await api.post('/cadastro', {
+              name,
+              email,
+              password,
+              userType,
+              relation: userType === 'familiar/amigo' ? relation : '',
+              nascDate: userType === 'familiar/amigo' ? nascDate : '',
+          });
+  
+          alert('Cadastro realizado com sucesso');
+          if (userType === 'cuidador') {
+              navigation.navigate('Login'); 
+          } else {
+          navigation.navigate('Login');
+          }
+      } catch (error) {
+          if (error.response && error.response.data.message) {
+              setErrorMessage(error.response.data.message);
+          } else {
+              setErrorMessage('Cadastro falhou. Verifique os dados e tente novamente.');
+          }
+          console.error('Erro ao cadastrar:', error.response ? error.response.data : error.message);
+      }
+  };
+  
 
   return (
     <View>

@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const Logo = () => {
+const Form = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [senhaVisible, setSenhaVisible] = useState(false);
@@ -18,6 +18,7 @@ const Logo = () => {
   const toggleSenha = () => {
     setSenhaVisible(!senhaVisible);
   };
+
 
   const handleLogin = async () => {
     try {
@@ -29,20 +30,30 @@ const Logo = () => {
         await AsyncStorage.setItem('token', token);
         await AsyncStorage.setItem('userId', user.id.toString());
         await AsyncStorage.setItem('userType', user.userType);
-
+  
+        if (user.connections && user.connections.length > 0) {
+          await AsyncStorage.setItem('connections', JSON.stringify(user.connections)); 
+        }      
+  
         if (user.userType === 'cuidador') {
-          navigation.navigate('Inicio'); 
+          navigation.navigate('Inicio');
         } else {
           navigation.navigate('Connect');
         }
       } else {
-        setErrorMessage('Dados de login inválidos'); 
+        setErrorMessage('Dados de login inválidos');
       }
     } catch (error) {
+      if (error.response && error.response.data.message) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage('Erro ao fazer login. Verifique suas credenciais e tente novamente.');
+      }
       console.error('Erro ao fazer login:', error.response ? error.response.data : error.message);
-      setErrorMessage('Erro ao fazer login. Verifique suas credenciais e tente novamente.'); 
     }
   };
+  
+  
   
 
   return (
@@ -86,4 +97,4 @@ const Logo = () => {
   );
 };
 
-export default Logo;
+export default Form;

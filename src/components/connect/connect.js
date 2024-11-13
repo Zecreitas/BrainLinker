@@ -14,6 +14,8 @@ const Connect = () => {
 
   useEffect(() => {
     const getTokenAndUserId = async () => {
+      await AsyncStorage.multiRemove(['remetenteId', 'destinatarioId', 'emailCuidador']);
+      
       const storedToken = await AsyncStorage.getItem('token');
       const storedUserId = await AsyncStorage.getItem('userId');
       setToken(storedToken || '');
@@ -21,7 +23,7 @@ const Connect = () => {
     };
     getTokenAndUserId();
   }, []);
-
+  
   const conectar = async () => {
     try {
       if (!token) {
