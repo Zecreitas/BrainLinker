@@ -32,6 +32,9 @@ const Relacao = () => {
 
   return (
     <View>
+      <TouchableOpacity style={{ padding: 10 }} onPress={() => navigation.goBack()}>
+        <MaterialCommunityIcons name="arrow-left" size={40} color="black" />
+      </TouchableOpacity>
       <View>
         <Image
           style={styles.image}

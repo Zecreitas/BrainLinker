@@ -2,7 +2,7 @@ import React, {useState, useEffect } from 'react';
 import {Image, View, TouchableOpacity, Text, } from 'react-native';
 import styles from './style';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { useNavigation } from '@react-navigation/native';
 

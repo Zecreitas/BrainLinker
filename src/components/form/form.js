@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
-import { MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const Form = () => {
@@ -58,6 +57,9 @@ const Form = () => {
 
   return (
     <View>
+      <TouchableOpacity style={{ padding: 10 }} onPress={() => navigation.goBack()}>
+        <MaterialCommunityIcons name="arrow-left" size={40} color="black" />
+      </TouchableOpacity>
       <Image style={styles.image} source={require('../../../assets/images/logo.png')} />
       <Text style={styles.texto}>Email</Text>
       <View style={styles.formInput}>

@@ -74,15 +74,12 @@ const Inicio = () => {
         const storedToken = await AsyncStorage.getItem('token');
         const storedConnectionId = await AsyncStorage.getItem('destinatarioId');
         const storedUserType = await AsyncStorage.getItem('userType'); 
+
   
   
         if (storedToken) setToken(storedToken);
         if (storedConnectionId) setConnectionId(storedConnectionId.replace(/"/g, '').trim());
         if (storedUserType) setUserType(storedUserType.replace(/"/g, '').trim());
-
-        console.log('Token:', storedToken);
-        console.log('Connection ID:', storedConnectionId);
-        console.log('User Type:', storedUserType);
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
       }
@@ -110,9 +107,7 @@ const Inicio = () => {
           todasNotificacoes = [...responseMensagens.data, ...responseMidias.data];
         } if (userType === 'familiar/amigo') {
           try {
-            console.log("Connection ID:", connectionId);
-            console.log("Token:", token);
-        
+
             const responseMensagens = await axios.get(
               `http://192.168.100.21:3000/api/mensagens-naolidas/${connectionId}`,
               { headers: { Authorization: `Bearer ${token}` } }
