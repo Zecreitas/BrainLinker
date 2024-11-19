@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const api = axios.create({
-    baseURL: 'http://192.168.100.21:3000/api',
+    baseURL: 'https://brainlinker-api-production.up.railway.app/api',
 });
 
 api.interceptors.request.use(async (config) => {
