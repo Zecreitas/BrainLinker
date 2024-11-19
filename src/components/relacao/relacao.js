@@ -15,7 +15,6 @@ const Relacao = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const handleConfirmDate = (date) => {
-    // Formatando a data para 'YYYY-MM-DD'
     const formattedDate = date.toISOString().split('T')[0];
     setNascDate(formattedDate);
     setDatePickerVisibility(false);

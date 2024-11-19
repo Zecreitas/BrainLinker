@@ -34,8 +34,8 @@ const Mensagens = () => {
     try {
       setLoading(true);
       const endpoint = userType === 'cuidador' 
-        ? 'http://192.168.100.21:3000/api/contatos/cuidador'
-        : 'http://192.168.100.21:3000/api/contatos/familiar';
+        ? 'https://brainlinker-api-production.up.railway.app/api/contatos/cuidador'
+        : 'https://brainlinker-api-production.up.railway.app/api/contatos/familiar';
   
       const response = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
@@ -62,7 +62,7 @@ const Mensagens = () => {
 
   const fetchUltimaMensagem = async (connectionId) => {
     try {
-      const response = await axios.get(`http://192.168.100.21:3000/api/messages/${connectionId}`, {
+      const response = await axios.get(`https://brainlinker-api-production.up.railway.app/api/messages/${connectionId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data && response.data.length > 0) {

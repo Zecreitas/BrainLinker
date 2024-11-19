@@ -60,7 +60,7 @@ const Midia = () => {
   const carregarMidias = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://192.168.100.21:3000/api/midias', {
+      const response = await axios.get('https://brainlinker-api-production.up.railway.app/api/midias', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -87,7 +87,7 @@ const Midia = () => {
   const carregarContatos = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://192.168.100.21:3000/api/contatos-midias', {
+      const response = await axios.get('https://brainlinker-api-production.up.railway.app/api/contatos-midias', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -190,7 +190,7 @@ const Midia = () => {
                     <Text style={styles.sendTime}>{formatarDataEnvio(midia.dataEnvio)} às {formatSendTime(midia.dataEnvio)}</Text>
                   </View>
                   <Image
-                    source={{ uri: `http://192.168.100.21:3000/${midia.caminho.replace(/\\/g, '/')}` }}
+                    source={{ uri: `https://brainlinker-api-production.up.railway.app/${midia.caminho.replace(/\\/g, '/')}` }}
                     style={styles.midiaImage}
                   />
                   <Text style={styles.midiaDescription}>{midia.descricao}</Text>

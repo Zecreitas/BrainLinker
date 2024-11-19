@@ -21,7 +21,7 @@ const Form = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://192.168.100.21:3000/api/login', { email, password });
+      const response = await axios.post('https://brainlinker-api-production.up.railway.app/api/login', { email, password });
   
       const { token, user } = response.data;
   

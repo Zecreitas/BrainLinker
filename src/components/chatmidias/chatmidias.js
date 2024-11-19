@@ -47,7 +47,7 @@ const ChatMidias = () => {
         console.log('Token:', token, 'Contato ID:', connectionId);
         try {
           setLoading(true);
-          const response = await axios.get(`http://192.168.100.21:3000/api/midias/contato/${connectionId}`, {
+          const response = await axios.get(`https://brainlinker-api-production.up.railway.app/api/midias/contato/${connectionId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           console.log('Resposta da API:', response.data);
@@ -102,11 +102,11 @@ const ChatMidias = () => {
           midias.map((midia) => (
             <TouchableOpacity
               key={midia._id}
-              onPress={() => openModal(`http://192.168.100.21:3000/${midia.caminho.replace(/\\/g, '/')}`)}
+              onPress={() => openModal(`https://brainlinker-api-production.up.railway.app/${midia.caminho.replace(/\\/g, '/')}`)}
               style={styles.midiaCard}
             >
               <Image
-                source={{ uri: `http://192.168.100.21:3000/${midia.caminho.replace(/\\/g, '/')}` }}
+                source={{ uri: `https://brainlinker-api-production.up.railway.app/${midia.caminho.replace(/\\/g, '/')}` }}
                 style={styles.midiaImage}
               />
               <Text style={styles.midiaDescription}>{midia.descricao}</Text>

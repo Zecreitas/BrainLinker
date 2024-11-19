@@ -18,7 +18,7 @@ const Dados = () => {
       const userId = await AsyncStorage.getItem('userId');
       
       if (storedToken && userId) {
-        const response = await axios.get(`http://192.168.100.21:3000/api/user/${userId}`, {
+        const response = await axios.get(`https://brainlinker-api-production.up.railway.app/api/user/${userId}`, {
           headers: {
             'Authorization': `Bearer ${storedToken}`,
           },

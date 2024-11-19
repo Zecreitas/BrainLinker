@@ -67,7 +67,7 @@ const SelecionarMidia = () => {
       formData.append("remetenteId", remetenteId);
       formData.append("tipo", "foto");
   
-      const response = await axios.post('http://10.0.2.2:3000/api/upload-midia', formData, {
+      const response = await axios.post('https://brainlinker-api-production.up.railway.app/api/upload-midia', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`,

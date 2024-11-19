@@ -12,7 +12,7 @@
     const conectarAutomaticamente = async (token, userId, emailCuidador) => {
       try {
         console.log('Email do Cuidador:', emailCuidador);
-        const response = await fetch('http://192.168.100.21:3000/api/conectar', {
+        const response = await fetch('https://brainlinker-api-production.up.railway.app/api/conectar', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -31,7 +31,7 @@ const Connect = () => {
         return;
       }
   
-      const conexoesResponse = await fetch(`http://192.168.100.21:3000/api/usuario/${userId}`, {
+      const conexoesResponse = await fetch(`https://brainlinker-api-production.up.railway.app/api/usuario/${userId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -52,7 +52,7 @@ const Connect = () => {
           return;
         }
       }
-      const response = await fetch('http://192.168.100.21:3000/api/conectar', {
+      const response = await fetch('https://brainlinker-api-production.up.railway.app/api/conectar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

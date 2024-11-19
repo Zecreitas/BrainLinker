@@ -20,7 +20,7 @@ const EditarDados = ({ navigation }) => {
         const userId = await AsyncStorage.getItem('userId');
 
         if (storedToken && userId) {
-          const response = await axios.get(`http://192.168.100.21:3000/api/user/${userId}`, {
+          const response = await axios.get(`https://brainlinker-api-production.up.railway.app/api/user/${userId}`, {
             headers: {
               'Authorization': `Bearer ${storedToken}`,
             },
@@ -47,7 +47,7 @@ const EditarDados = ({ navigation }) => {
       const storedToken = await AsyncStorage.getItem('token');
       const userId = await AsyncStorage.getItem('userId');
 
-      const response = await axios.put(`http://192.168.100.21:3000/api/user/${userId}`, {
+      const response = await axios.put(`https://brainlinker-api-production.up.railway.app/api/user/${userId}`, {
         name,
         relation,
       }, {
@@ -70,7 +70,7 @@ const EditarDados = ({ navigation }) => {
     try {
       const storedToken = await AsyncStorage.getItem('token');
 
-      const response = await axios.post(`http://192.168.100.21:3000/api/conectar`, {
+      const response = await axios.post(`https://brainlinker-api-production.up.railway.app/api/conectar`, {
         emailCuidador: emailConnection,
       }, {
         headers: {

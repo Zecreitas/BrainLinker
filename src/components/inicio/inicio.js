@@ -97,11 +97,11 @@ const Inicio = () => {
   
         if (userType === 'cuidador') {
           const responseMensagens = await axios.get(
-            `http://192.168.100.21:3000/api/mensagens-naolidas`,
+            `https://brainlinker-api-production.up.railway.app/api/mensagens-naolidas`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           const responseMidias = await axios.get(
-            `http://192.168.100.21:3000/api/midias-semana`,
+            `https://brainlinker-api-production.up.railway.app/api/midias-semana`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           todasNotificacoes = [...responseMensagens.data, ...responseMidias.data];
@@ -109,7 +109,7 @@ const Inicio = () => {
           try {
 
             const responseMensagens = await axios.get(
-              `http://192.168.100.21:3000/api/mensagens-naolidas/${connectionId}`,
+              `https://brainlinker-api-production.up.railway.app/api/mensagens-naolidas/${connectionId}`,
               { headers: { Authorization: `Bearer ${token}` } }
             );
             todasNotificacoes = [...responseMensagens.data];
@@ -137,7 +137,7 @@ const Inicio = () => {
   const marcarMensagemComoLida = async (mensagemId) => {
     try {
       await axios.put(
-        `http://192.168.100.21:3000/api/marcar-como-lida/${mensagemId}`,
+        `https://brainlinker-api-production.up.railway.app/api/marcar-como-lida/${mensagemId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -149,7 +149,7 @@ const Inicio = () => {
   const marcarMidiaComoLida = async (midiaId) => {
     try {
       await axios.put(
-        `http://192.168.100.21:3000/api/marcar-midia-como-lida/${midiaId}`,
+        `https://brainlinker-api-production.up.railway.app/api/marcar-midia-como-lida/${midiaId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -182,7 +182,7 @@ const Inicio = () => {
 
   const renderizarImagem = (caminho) => {
     if (caminho) {
-      const imageUrl = `http://192.168.100.21:3000/${caminho.replace(/\\/g, '/')}`;
+      const imageUrl = `https://brainlinker-api-production.up.railway.app/${caminho.replace(/\\/g, '/')}`;
       return <Image source={{ uri: imageUrl }} style={styles.midiaImage} />;
     }
     return null;

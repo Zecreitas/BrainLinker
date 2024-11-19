@@ -49,7 +49,7 @@ const Chat = () => {
     if (!connectionId || !token) return;
     
     try {
-      const response = await axios.get(`http://192.168.100.21:3000/api/messages/${connectionId}`, {
+      const response = await axios.get(`https://brainlinker-api-production.up.railway.app/api/messages/${connectionId}`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       setMensagens(response.data);
@@ -68,7 +68,7 @@ const Chat = () => {
     if (!textoMensagem || !remetenteId || !destinatarioId || !token) return;
   
     try {
-      const response = await axios.post('http://192.168.100.21:3000/api/messages', {
+      const response = await axios.post('https://brainlinker-api-production.up.railway.app/api/messages', {
         destinatarioId,
         texto: textoMensagem,
       }, {
