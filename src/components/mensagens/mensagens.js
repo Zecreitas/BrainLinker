@@ -40,7 +40,9 @@ const Mensagens = () => {
       const response = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
+      console.log('Dados da API:', response.data); 
+  
       if (response.status === 200) {
         const contatosOrdenados = await Promise.all(
           response.data.map(async (contato) => {
@@ -59,6 +61,7 @@ const Mensagens = () => {
       setLoading(false);
     }
   };
+  
 
   const fetchUltimaMensagem = async (connectionId) => {
     try {
@@ -77,11 +80,16 @@ const Mensagens = () => {
   };
 
   const abrirChat = (contato) => {
+    console.log('Contato antes de navegar:', contato);
+    console.log('ID enviado:', contato._id);
     navigation.navigate('Chat', { 
       connectionId: contato._id, 
       destinatarioId: contato._id 
     });
   };
+  
+  
+  
 
   return (
     <View style={styles.container}>
@@ -99,7 +107,10 @@ const Mensagens = () => {
             <TouchableOpacity
               key={contato._id}
               style={styles.contatoCard}
-              onPress={() => abrirChat(contato)}
+              onPress={() => {
+                abrirChat(contato);
+              }}
+                
             >
               <Text style={styles.contatoNome}>{contato.name}</Text>
               <Text style={styles.contatoInfo}>

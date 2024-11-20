@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, TextInput, Image, Platform } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import styles from './style';
 
 const Relacao = () => {

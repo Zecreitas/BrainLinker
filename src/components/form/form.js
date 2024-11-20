@@ -29,6 +29,7 @@ const Form = () => {
         await AsyncStorage.setItem('token', token);
         await AsyncStorage.setItem('userId', user.id.toString());
         await AsyncStorage.setItem('userType', user.userType);
+        await AsyncStorage.setItem('remetenteId', user.id.toString());
   
         if (user.connections && user.connections.length > 0) {
           await AsyncStorage.setItem('connections', JSON.stringify(user.connections)); 

@@ -45,6 +45,11 @@ const Chat = () => {
     carregarDados();
   }, [connectionId]);
 
+  useEffect(() => {
+    console.log('Parâmetros recebidos na tela de chat:', route.params);
+  }, []);
+  
+
   const fetchMensagens = async () => {
     if (!connectionId || !token) return;
     
@@ -65,24 +70,36 @@ const Chat = () => {
   }, [connectionId, token]);
 
   const enviarMensagem = async () => {
-    if (!textoMensagem || !remetenteId || !destinatarioId || !token) return;
+    if (!textoMensagem || !remetenteId || !destinatarioId || !token) {
+      console.log('Erro: Algum dado está ausente', { textoMensagem, remetenteId, destinatarioId, token });
+      return;
+    }
   
     try {
-      const response = await axios.post('https://brainlinker-api-production.up.railway.app/api/messages', {
+      console.log('Enviando mensagem com os seguintes dados:', {
         destinatarioId,
-        texto: textoMensagem,
-      }, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        textoMensagem,
+        remetenteId,
+        token,
       });
   
-      if (response.data.mensagem) { 
+      const response = await axios.post(
+        'https://brainlinker-api-production.up.railway.app/api/messages',
+        { destinatarioId, texto: textoMensagem },
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+  
+      console.log('Resposta do servidor ao enviar mensagem:', response.data);
+  
+      if (response.data.mensagem) {
         setMensagens([...mensagens, response.data.mensagem]);
       }
       setTextoMensagem('');
     } catch (error) {
-      console.error('Erro ao enviar mensagem:', error);
+      console.error('Erro ao enviar mensagem:', error.response?.data || error.message);
     }
   };
+  
 
   const formatarHora = (data) => {
     return moment(data).tz('America/Sao_Paulo').format('HH:mm');

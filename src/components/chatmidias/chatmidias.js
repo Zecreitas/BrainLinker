@@ -23,7 +23,7 @@ const ChatMidias = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const route = useRoute();
   const navigation = useNavigation();
-  const { connectionId } = route.params;
+  const { contatoId } = route.params;
 
   useEffect(() => {
     const carregarToken = async () => {
@@ -43,11 +43,11 @@ const ChatMidias = () => {
 
   useEffect(() => {
     const carregarMidiasContato = async () => {
-      if (token && connectionId) {
-        console.log('Token:', token, 'Contato ID:', connectionId);
+      if (token && contatoId) {
+        console.log('Token:', token, 'Contato ID:', contatoId);
         try {
           setLoading(true);
-          const response = await axios.get(`https://brainlinker-api-production.up.railway.app/api/midias/contato/${connectionId}`, {
+          const response = await axios.get(`https://brainlinker-api-production.up.railway.app/api/midias/contato/${contatoId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           console.log('Resposta da API:', response.data);
@@ -63,11 +63,11 @@ const ChatMidias = () => {
           setLoading(false);
         }
       } else {
-        console.log('Token ou contatoId não definidos:', token, connectionId);
+        console.log('Token ou contatoId não definidos:', token, contatoId);
       }
     };
     carregarMidiasContato();
-  }, [token, connectionId]);
+  }, [token, contatoId]);
   
   const calcularIdade = (dataNasc) => {
     const nascimento = new Date(dataNasc);

@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 200,
+        marginTop: 150,
         alignSelf: 'center',
     },
     cad:{

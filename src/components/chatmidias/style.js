@@ -35,8 +35,6 @@ const styles = StyleSheet.create({
         width: 90,
         height: 90,
         alignItems: 'center',
-        shadowColor: "#000",
-        shadowColor: "#000",
       },
       botaoTexto: {
         color: 'white',

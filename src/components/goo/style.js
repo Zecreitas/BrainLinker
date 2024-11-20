@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 200,
+        marginTop: 120,
         alignSelf: 'center',
     },
     tcad:{
